@@ -152,22 +152,29 @@ SELECT description FROM EnergyTeam;
 The hardest part of the process was figuring out how which kubernetes solution to use, as well as what the minimum specs for the cluster should realistically be.
 
 For this assessment, I went with minikube on a VM as it is what I personally have had more experience with, having worked a bit with minikube before. Other possible projects I could've used include Kind and k3s.
+
 Kind creates a kubernetes environment on Docker containers, creating master and worker nodes as containers on your machine, whereas k3s is an CNCF certified light k8s distribution, which supports single node setups.
 For an exercise like this, all three solutions are viable. k3s is the most lightweight of the bunch, whereas Kind is tailor-made for local dev testing. There are also other solutions out there, each with their own pros and cons.
 
-Deciding on minimum specs for the minikube VM was also a process that took some consideration, as well as trial and error. On my local machine, I could get the setup to work in about 5 minutes, but using a VM took
-longer as I initially allocated too little storage space and CPU cores, causing issues in the deployment that were very difficult to debug and identify. I eventually settled on the current minimum specs through both trial and error as well as with guidance from the various
-documentations I have made use of when doing the assessment. I believe the minimum requirements could be lower, in particular regarding to RAM, however, for simplicity's sake I had opted to play it safe and give more than needed to ensure smooth sailing for this assessment.
+Deciding on minimum specs for the minikube VM was also a process that took some consideration, as well as trial and error. On my local machine, I could get the setup to work in about 5 minutes, but using a VM took longer as I initially allocated too little storage space and CPU cores, causing issues in the deployment that were very difficult to debug and identify. I eventually settled on the current minimum specs through both trial and error as well as with guidance from the various documentations I have made use of when doing the assessment.
+
+I believe the minimum requirements could be lower, in particular regarding to RAM, however, for simplicity's sake I had opted to play it safe and give more than needed to ensure smooth sailing for this assessment.
 
 ### Challenges and limitations with the current architecture
-Firstly, the current architecture I am using is not production ready in any capacity. The configuration for the postgres DB used is the default configuration given by the operator. This works as a very basic instance for the scope of the task, but is lacking
-in terms of security, high-availability, and most importantly, networking. Currently, the only way to access the database is through a pod inside the cluster itself. For some uses, this may be good enough, but if you want to access the database through any other way this method proves to fail.
+Firstly, the current architecture I am using is not production ready in any capacity. The configuration for the postgres DB used is the default configuration given by the operator. This works as a very basic instance for the scope of the task, but is lacking in terms of security, high-availability, and most importantly, networking.
+Currently, the only way to access the database is through a pod inside the cluster itself. For some uses, this may be good enough, but if you want to access the database through any other way this method proves to fail. 
+
 Additionally, there is no SSL configured for the connection to the DB, which serves as a security vulnerability. Lastly, as we have configured everything on a minikube cluster, our entire workload is running on one single node. This means we have a single point of failure issue, where
 if the node goes down, our entire architecture goes down with it, as we cannot spin up different nodes in our environment as is.
 
 ### Changes I would make given more time
-The architecture given here works well enough for the small scope of a home exercise, but as stated above, there is much to be improved upon. Firstly, I would switch to a production-safe kubernetes distribution, perferably hosted on a cloud provider
-like Azure, GCP or AWS (assuming, of course, it is possible when taking into consideration the environment the project is running on). Secondly, I would switch to using helm. Currently the operator is deployed using plain kubectl, which means our manifests are applied individually. This is not an ideal solution,
-as we wish to consolidate everything into one spot, which is where helm comes into play. By using helm, all we need is to install a helm chart with a values.yaml manifest containing our desired parameters, and we are good to go. If we want to update our operator or change something in it's configuration we are able to do so by
-redeploying the helm chart, or even rolling back to a previous revision if something goes wrong during an update. Thirdly, I would make sure to pass actual configuration parameters to our DB, to make sure it serves the purpose we need it to. This includes possibly assigning to a LoadBalancer service or an ingress service so it can be accessed from outside the cluster.
-Lastly, I would secure the whole thing with TLS/SSL, creating a SSL certificate for our DB so we can use it to make our connection is indeed secure.
+The architecture given here works well enough for the small scope of a home exercise, but as stated above, there is much to be improved upon.
+
+Firstly, I would switch to a production-safe kubernetes distribution, perferably hosted on a cloud provider like Azure, GCP or AWS (assuming, of course, it is possible when taking into consideration the environment the project is running on).
+
+Secondly, I would switch to using helm. Currently the operator is deployed using plain kubectl, which means our manifests are applied individually. This is not an ideal solution,
+as we wish to consolidate everything into one spot, which is where helm comes into play. By using helm, all we need is to install a helm chart with a values.yaml manifest containing our desired parameters, and we are good to go. If we want to update our operator or change something in it's configuration we are able to do so by redeploying the helm chart, or even rolling back to a previous revision if something goes wrong during an update.
+
+Thirdly, I would make sure to pass actual configuration parameters to our DB, to make sure it serves the purpose we need it to. This includes possibly assigning to a LoadBalancer service or an ingress service so it can be accessed from outside the cluster.
+
+Lastly, I would secure the DB with TLS/SSL, creating a SSL certificate for our DB so we can use it to make our connection is indeed secure.
