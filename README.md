@@ -4,6 +4,15 @@
 
 ### Prerequisites
 A clean VM with linux installed on it. For this assessment, I will be using ubuntu, deployed on VirtualBox.
+
+Links:
+- Ubuntu ISO: https://ubuntu.com/download/server/thank-you?version=26.04.1&architecture=amd64&lts=true
+- VirtualBox: https://www.virtualbox.org/wiki/Downloads
+
+VM setup guide: https://ubuntu.com/tutorials/how-to-run-ubuntu-desktop-on-a-virtual-machine-using-virtualbox#4-explore-virtual-box
+
+-# Note: This guide is for VirtualBox 7
+
 System Requirements:
 - 4GB RAM
 - 2 vCPU
